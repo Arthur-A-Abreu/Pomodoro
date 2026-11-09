@@ -86,6 +86,8 @@ let state = {
   currentBgCat: 'solid',
   overlayOpacity: 50,
   quoteIndex: 0,
+  todayFocusMin: 0,
+  todayDate: new Date().toDateString(),
   config: {
     focus: 25,
     break: 5,
@@ -99,6 +101,8 @@ const D = {};
 
 function cacheDOM() {
   const g = id => document.getElementById(id);
+  D.btnNotify       = g('btn-notify');
+  D.notifyIcon      = g('notify-icon');
   D.bgLayer         = g('bg-layer');
   D.bgOverlay       = g('bg-overlay');
   D.canvas          = g('particles-canvas');
@@ -134,6 +138,7 @@ function cacheDOM() {
   D.cfgLongBreak    = g('cfg-longBreak');
   D.cfgSessions     = g('cfg-sessionsUntilLong');
   D.sessionDots     = g('session-dots');
+  D.totalFocusMin   = g('total-focus-min');
   D.totalSessions   = g('total-sessions');
   D.quoteContent    = g('quote-content');
   D.quoteText       = g('quote-text');
@@ -219,6 +224,71 @@ function playClick() {
   } catch (e) { /* audio blocked */ }
 }
 
+// ===== NOTIFICATIONS =========================================
+
+function requestNotificationPermission() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    Notification.requestPermission().then(refreshNotifyBtn);
+  }
+}
+
+function refreshNotifyBtn() {
+  if (!D.btnNotify) return;
+  const perm = 'Notification' in window ? Notification.permission : 'unsupported';
+  D.btnNotify.classList.remove('notify-granted', 'notify-denied');
+  if (perm === 'granted') {
+    D.notifyIcon.textContent = '🔔';
+    D.btnNotify.classList.add('notify-granted');
+    D.btnNotify.title = 'Notificações ativas ✓';
+  } else if (perm === 'denied') {
+    D.notifyIcon.textContent = '🔕';
+    D.btnNotify.classList.add('notify-denied');
+    D.btnNotify.title = 'Notificações bloqueadas no browser';
+  } else {
+    D.notifyIcon.textContent = '🔔';
+    D.btnNotify.title = 'Clique para ativar notificações';
+  }
+}
+
+function sendNotification(title, body) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try { new Notification(title, { body, tag: 'pomodoro-rgb', silent: false }); } catch (e) {}
+}
+
+// ===== RING COLOR PER MODE ==================================
+
+function updateRingForMode() {
+  const { mode, themeColor: p, themeSecondary: s, themeAccent: a } = state;
+  if (mode === 'break') {
+    D.gradStop0.setAttribute('stop-color', s);
+    D.gradStop1.setAttribute('stop-color', '#00C8FF');
+    D.gradStop2.setAttribute('stop-color', p);
+  } else if (mode === 'longBreak') {
+    D.gradStop0.setAttribute('stop-color', a);
+    D.gradStop1.setAttribute('stop-color', '#FF8C00');
+    D.gradStop2.setAttribute('stop-color', '#FFD700');
+  } else {
+    // focus / idle / paused — theme colors
+    D.gradStop0.setAttribute('stop-color', p);
+    D.gradStop1.setAttribute('stop-color', s);
+    D.gradStop2.setAttribute('stop-color', a);
+  }
+}
+
+// ===== DAILY STATS ==========================================
+
+function checkDailyReset() {
+  const today = new Date().toDateString();
+  if (state.todayDate !== today) {
+    state.todayDate      = today;
+    state.todayFocusMin  = 0;
+    state.sessionsCompleted = 0;
+    if (D.totalSessions)  D.totalSessions.textContent  = 0;
+    if (D.totalFocusMin)  D.totalFocusMin.textContent  = 0;
+  }
+}
+
 // ===== TIMER LOGIC ==========================================
 
 function secondsForMode(mode) {
@@ -287,15 +357,27 @@ function onTimerEnd() {
   if (state.mode === 'focus') {
     state.sessionsCompleted++;
     D.totalSessions.textContent = state.sessionsCompleted;
+
+    // Daily stats
+    checkDailyReset();
+    state.todayFocusMin += state.config.focus;
+    if (D.totalFocusMin) D.totalFocusMin.textContent = state.todayFocusMin;
+
     playFocusAlarm();
 
     const isLong = (state.sessionsCompleted % state.config.sessionsUntilLong) === 0;
     state.mode = isLong ? 'longBreak' : 'break';
+
+    sendNotification(
+      isLong ? '🏆 Ciclo Completo!' : '✅ Sessão Completa!',
+      isLong ? 'Hora de uma pausa longa e merecida!' : 'Faça uma pausa rápida e volte com tudo!'
+    );
     showModal('focusDone', isLong);
 
   } else if (state.mode === 'break' || state.mode === 'longBreak') {
     playBreakAlarm();
     state.mode = 'focus';
+    sendNotification('⚡ Hora de Focar!', 'A pausa acabou — você consegue!');
     showModal('breakDone');
   }
 
@@ -704,6 +786,35 @@ function bindEvents() {
     saveState();
   });
 
+  // --- Notifications toggle ---
+  if (D.btnNotify) {
+    D.btnNotify.addEventListener('click', () => {
+      if (!('Notification' in window)) {
+        alert('Seu navegador não suporta notificações de sistema.');
+        return;
+      }
+      if (Notification.permission === 'granted') {
+        // Envia uma notificação de teste para confirmar que funciona
+        new Notification('🔔 Pomodoro RGB', {
+          body: 'Notificações ativas! Você será avisado quando o tempo acabar.',
+          icon: 'favicon.ico'
+        });
+      } else if (Notification.permission === 'denied') {
+        alert('As notificações foram bloqueadas nas configurações do seu navegador. Para reativar, clique no cadeado ao lado da URL.');
+      } else {
+        Notification.requestPermission().then(perm => {
+          refreshNotifyBtn();
+          if (perm === 'granted') {
+            new Notification('🔔 Pomodoro RGB', {
+              body: 'Notificações ativadas com sucesso!',
+              icon: 'favicon.ico'
+            });
+          }
+        });
+      }
+    });
+  }
+
   // --- Dropdown toggles ---
   D.btnColor.addEventListener('click', e => {
     e.stopPropagation();
@@ -808,6 +919,7 @@ function init() {
   cacheDOM();
   loadState();
   applyLoadedState();
+  refreshNotifyBtn();
   buildPaletteGrid();
   initBgGallery();
   initParticles();

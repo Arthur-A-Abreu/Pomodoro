@@ -92,15 +92,28 @@ button { font-family: inherit; }
 .logo {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   user-select: none;
 }
 
-.logo-hex {
-  font-size: 1.5rem;
+.logo-clock {
+  width: 36px;
+  height: 36px;
   color: var(--primary);
-  filter: drop-shadow(0 0 10px rgba(var(--primary-rgb), 0.9));
+  filter: drop-shadow(0 0 8px rgba(var(--primary-rgb), 0.85));
   transition: color var(--transition), filter var(--transition);
+  flex-shrink: 0;
+}
+
+/* Minute hand ticks on hover */
+.logo:hover .logo-clock {
+  filter: drop-shadow(0 0 14px rgba(var(--primary-rgb), 1));
+  animation: logo-tick 0.5s steps(1) infinite;
+}
+
+@keyframes logo-tick {
+  0%  { transform: rotate(0deg);   }
+  50% { transform: rotate(0.5deg); }
 }
 
 .logo-name {
@@ -841,3 +854,157 @@ button:focus-visible {
 /* ===== SELECTION ===== */
 ::selection { background: rgba(var(--primary-rgb), 0.35); }
 
+
+/* ===== KBD HINT ===== */
+.kbd-hint {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  user-select: none;
+}
+
+kbd {
+  display: inline-block;
+  padding: 2px 7px;
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+/* ===== MODE BODY CLASSES ===== */
+/* Focus mode */
+body.mode-focus .mode-badge {
+  background: rgba(var(--primary-rgb), 0.14);
+  border-color: rgba(var(--primary-rgb), 0.38);
+}
+body.mode-focus .timer-time {
+  text-shadow: 0 0 40px rgba(var(--primary-rgb), 0.65);
+}
+
+/* Break mode */
+body.mode-break .mode-badge {
+  background: rgba(var(--secondary-rgb), 0.14);
+  border-color: rgba(var(--secondary-rgb), 0.38);
+}
+body.mode-break .mode-pulse { background: var(--secondary); }
+body.mode-break .timer-time {
+  text-shadow: 0 0 40px rgba(var(--secondary-rgb), 0.65);
+}
+body.mode-break .btn-primary { background: var(--secondary); box-shadow: 0 4px 22px rgba(var(--secondary-rgb), 0.45); }
+
+/* Long break mode */
+body.mode-longBreak .mode-badge {
+  background: rgba(var(--accent-rgb), 0.14);
+  border-color: rgba(var(--accent-rgb), 0.38);
+}
+body.mode-longBreak .mode-pulse { background: var(--accent); }
+body.mode-longBreak .timer-time {
+  text-shadow: 0 0 40px rgba(var(--accent-rgb), 0.65);
+}
+body.mode-longBreak .btn-primary { background: var(--accent); box-shadow: 0 4px 22px rgba(var(--accent-rgb), 0.45); }
+
+/* Paused mode */
+body.mode-paused .mode-badge {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.14);
+}
+body.mode-paused .mode-pulse {
+  background: rgba(255,255,255,0.4);
+  animation: none;
+}
+
+/* ===== IDLE — disable skip btn visually ===== */
+body:not(.mode-focus):not(.mode-break):not(.mode-longBreak):not(.mode-paused) #btn-skip {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* ===== NOTIFICATION BTN STATES ===== */
+.ctrl-btn.notify-granted  { color: #00C97A; border-color: rgba(0,201,122,0.35); }
+.ctrl-btn.notify-denied   { opacity: 0.4; pointer-events: none; }
+
+/* ===== KBD HINT ===== */
+.kbd-hint {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  user-select: none;
+}
+
+kbd {
+  display: inline-block;
+  padding: 2px 7px;
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+/* ===== MODE BODY CLASSES ===== */
+/* Focus mode */
+body.mode-focus .mode-badge {
+  background: rgba(var(--primary-rgb), 0.14);
+  border-color: rgba(var(--primary-rgb), 0.38);
+}
+body.mode-focus .timer-time {
+  text-shadow: 0 0 40px rgba(var(--primary-rgb), 0.65);
+}
+
+/* Break mode */
+body.mode-break .mode-badge {
+  background: rgba(var(--secondary-rgb), 0.14);
+  border-color: rgba(var(--secondary-rgb), 0.38);
+}
+body.mode-break .mode-pulse { background: var(--secondary); }
+body.mode-break .timer-time {
+  text-shadow: 0 0 40px rgba(var(--secondary-rgb), 0.65);
+}
+body.mode-break .btn-primary { background: var(--secondary); box-shadow: 0 4px 22px rgba(var(--secondary-rgb), 0.45); }
+
+/* Long break mode */
+body.mode-longBreak .mode-badge {
+  background: rgba(var(--accent-rgb), 0.14);
+  border-color: rgba(var(--accent-rgb), 0.38);
+}
+body.mode-longBreak .mode-pulse { background: var(--accent); }
+body.mode-longBreak .timer-time {
+  text-shadow: 0 0 40px rgba(var(--accent-rgb), 0.65);
+}
+body.mode-longBreak .btn-primary { background: var(--accent); box-shadow: 0 4px 22px rgba(var(--accent-rgb), 0.45); }
+
+/* Paused mode */
+body.mode-paused .mode-badge {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.14);
+}
+body.mode-paused .mode-pulse {
+  background: rgba(255,255,255,0.4);
+  animation: none;
+}
+
+/* ===== IDLE — disable skip btn visually ===== */
+body:not(.mode-focus):not(.mode-break):not(.mode-longBreak):not(.mode-paused) #btn-skip {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* ===== NOTIFICATION BTN STATES ===== */
+.ctrl-btn.notify-granted  { color: #00C97A; border-color: rgba(0,201,122,0.35); }
+.ctrl-btn.notify-denied   { opacity: 0.4; pointer-events: none; }

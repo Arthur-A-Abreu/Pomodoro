@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="arc" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#7B2FBE"/>
+      <stop offset="100%" stop-color="#1A6DFF"/>
+    </linearGradient>
+  </defs>
+  <!-- Clock face -->
+  <circle cx="24" cy="24" r="21" fill="#0D0D1A" stroke="#7B2FBE" stroke-width="2.5" opacity="0.9"/>
+  <circle cx="24" cy="24" r="18" fill="rgba(123,47,190,0.15)" stroke="#7B2FBE" stroke-width="1.8"/>
+  <!-- Hour ticks -->
+  <line x1="24" y1="8"  x2="24" y2="11" stroke="#EEEEFF" stroke-width="2"   stroke-linecap="round"/>
+  <line x1="24" y1="37" x2="24" y2="40" stroke="#EEEEFF" stroke-width="2"   stroke-linecap="round"/>
+  <line x1="8"  y1="24" x2="11" y2="24" stroke="#EEEEFF" stroke-width="2"   stroke-linecap="round"/>
+  <line x1="37" y1="24" x2="40" y2="24" stroke="#EEEEFF" stroke-width="2"   stroke-linecap="round"/>
+  <!-- Minor ticks -->
+  <line x1="34.6" y1="10.6" x2="33.1" y2="12.2" stroke="#EEEEFF" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+  <line x1="13.4" y1="10.6" x2="14.9" y2="12.2" stroke="#EEEEFF" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+  <line x1="34.6" y1="37.4" x2="33.1" y2="35.8" stroke="#EEEEFF" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+  <line x1="13.4" y1="37.4" x2="14.9" y2="35.8" stroke="#EEEEFF" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+  <!-- Hour hand -->
+  <line x1="24" y1="24" x2="24" y2="15" stroke="#EEEEFF" stroke-width="2.4" stroke-linecap="round"/>
+  <!-- Minute hand -->
+  <line x1="24" y1="24" x2="31" y2="20" stroke="#EEEEFF" stroke-width="1.8" stroke-linecap="round" opacity="0.9"/>
+  <!-- Center dot -->
+  <circle cx="24" cy="24" r="2.2" fill="#7B2FBE"/>
+  <!-- Gradient arc (top-right quarter) -->
+  <path d="M24 6 A18 18 0 0 1 42 24" fill="none" stroke="url(#arc)" stroke-width="3" stroke-linecap="round"/>
+</svg>
+
